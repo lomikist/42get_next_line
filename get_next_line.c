@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 6
+#define BUFFER_SIZE 8
 
 size_t	ft_strlen(const char *s)
 {
@@ -93,9 +93,9 @@ char	*ft_strcat(char *s1, const char *s2)
 
 char	*read_one_line(int fd)
 {
-	char	*str_read;
-	char	*str;
-	char	*str_temp;
+	char	*str_read = NULL;
+	char	*str = NULL;
+	char	*str_temp = NULL;
 	int		buffer_counter;
 
 	buffer_counter = 1;
