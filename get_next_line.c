@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 30
+#define BUFFER_SIZE 6
 
 size_t	ft_strlen(const char *s)
 {
@@ -103,7 +103,7 @@ char	*read_one_line(int fd)
 	read(fd, str_read, BUFFER_SIZE);
 	while (!ft_strchr(str_read, '\n'))
 	{
-		if (str)
+		if (str)// !problem here str is "\203\370\377\017\205W\377\377\377\270\377\377\377\377\351P\377\377\377f.\017\037\204"
 		{
 			str_temp = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
 			ft_strcpy(str_temp, str);
@@ -129,17 +129,27 @@ char	*get_next_line(int fd)
 	int			finded_index;
 	int			full_str_len;
 
-	full_str = (const char *)read_one_line(fd);
-	finded_index = ft_strchr(full_str, '\n') - &full_str[0];
-	full_str_len = ft_strlen(full_str);
-	str = ft_substr(full_str, 0, finded_index);
-	tail_str = ft_substr(full_str, finded_index + 1, full_str_len - 2 - finded_index);
-
+	if (tail_str)
+	{
+		char *str_read = read_one_line(fd);
+		return tail_str;
+	}
+	else 
+	{
+		full_str = (const char *)read_one_line(fd);
+		finded_index = ft_strchr(full_str, '\n') - &full_str[0];
+		full_str_len = ft_strlen(full_str);
+		str = ft_substr(full_str, 0, finded_index);
+		tail_str = ft_substr(full_str, finded_index + 1, full_str_len - finded_index);
+		//?ask it
+		free((char *)full_str);
+	}
 	return (str);
 }
 
 int main()
 {
 	int fd = open("test", O_RDONLY);
+	puts(get_next_line(fd));
 	puts(get_next_line(fd));
 }
