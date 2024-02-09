@@ -1,9 +1,6 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "get_next_line.h"
 
-#define BUFFER_SIZE 8
+// #define BUFFER_SIZE 6
 
 size_t	ft_strlen(const char *s)
 {
@@ -13,6 +10,40 @@ size_t	ft_strlen(const char *s)
 	while (s[length])
 		length++;
 	return (length);
+}
+
+char	*ft_strcpy(char *dest, char *src)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+char	*ft_strcat(char *s1, const char *s2)
+{
+	int		a;
+	int		b;
+	char	*tmp;
+	char	*s1_for_free;
+
+	s1_for_free = s1;
+	a = ft_strlen(s1);
+	b = 0;
+	tmp = s1;
+	s1 = (char*)malloc((ft_strlen(s1) + ft_strlen((char*)s2)) + 1);
+	ft_strcpy(s1, tmp);
+	while (s2[b])
+		s1[a++] = s2[b++];
+	s1[a] = '\0';
+	free(s1_for_free);
+	return (s1);
 }
 
 char	*ft_strchr(const char *s, int c)
@@ -60,35 +91,33 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 
-char	*ft_strcpy(char *dest, char *src)
+char	*ft_strjoin(char *s1, const char *s2)
 {
-	unsigned int	i;
+	char	*str;
+	size_t	i;
+	size_t	j;
 
+	if (!s1 || !s2)
+		return (NULL);
+	str = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (!str)
+		return (NULL);
 	i = 0;
-	while (src[i] != '\0')
+	while (s1[i])
 	{
-		dest[i] = src[i];
-		i++;
+		str[i] = s1[i];
+		++i;
 	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char	*ft_strcat(char *s1, const char *s2)
-{
-	int a;
-	int b;
-	char *tmp;
-
-	a = ft_strlen(s1);
-	b = 0;
-	tmp = s1;
-	s1 = (char*)malloc((ft_strlen(s1) + ft_strlen((char*)s2)) + 1);
-	ft_strcpy(s1, tmp);
-	while (s2[b])
-		s1[a++] = s2[b++];
-	s1[a] = '\0';
-	return (s1);
+	j = 0;
+	while (s2[j])
+	{
+		str[i] = s2[j];
+		++j;
+		++i;
+	}
+	free(s1);
+	str[i] = '\0';
+	return (str);
 }
 
 char	*read_one_line(int fd)
@@ -103,28 +132,27 @@ char	*read_one_line(int fd)
 	read(fd, str_read, BUFFER_SIZE);
 	while (!ft_strchr(str_read, '\n'))
 	{
-		if (str)// !problem here str is "\203\370\377\017\205W\377\377\377\270\377\377\377\377\351P\377\377\377f.\017\037\204"
+		if (str)
 		{
 			str_temp = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
 			ft_strcpy(str_temp, str);
-			free(str);
+			str = ft_strjoin(str, str_read);
+		}
+		else 
+		{
+			str = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
+			ft_strcpy(str, str_read);
 		}
 		buffer_counter++;
-		str = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
-		if (str_temp)
-			ft_strcpy(str, str_temp);
-		else
-			ft_strcpy(str, str_read);
 		read(fd, str_read, BUFFER_SIZE);
-		str = ft_strcat(str, str_read);
 	}
 	return (str);
 }
 
 char	*get_next_line(int fd)
 {
-	char		*str;
-	const char	*full_str;
+	char		*str = NULL;
+	const char	*full_str = NULL;
 	static char	*tail_str;
 	int			finded_index;
 	int			full_str_len;
@@ -132,6 +160,7 @@ char	*get_next_line(int fd)
 	if (tail_str)
 	{
 		char *str_read = read_one_line(fd);
+		tail_str = ft_strjoin(tail_str, str_read);
 		return tail_str;
 	}
 	else 
@@ -147,9 +176,14 @@ char	*get_next_line(int fd)
 	return (str);
 }
 
-int main()
-{
-	int fd = open("test", O_RDONLY);
-	puts(get_next_line(fd));
-	puts(get_next_line(fd));
-}
+// int main()
+// {
+// 	int fd = open("test", O_RDONLY);
+// 	char *a = get_next_line(fd);
+// 	char *b = get_next_line(fd);
+// 	puts(a);
+// 	puts(b);
+// 	free(a);
+// 	free(b);
+// 	// system("leaks a.out");
+// }
