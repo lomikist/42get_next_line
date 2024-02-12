@@ -1,6 +1,6 @@
 #include "get_next_line.h"
 
-// #define BUFFER_SIZE 6
+#define BUFFER_SIZE 6
 
 size_t	ft_strlen(const char *s)
 {
@@ -136,7 +136,9 @@ char	*read_one_line(int fd)
 		{
 			str_temp = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
 			ft_strcpy(str_temp, str);
+			read(fd, str_read, BUFFER_SIZE);
 			str = ft_strjoin(str, str_read);
+			free(str_temp);
 		}
 		else 
 		{
@@ -144,8 +146,8 @@ char	*read_one_line(int fd)
 			ft_strcpy(str, str_read);
 		}
 		buffer_counter++;
-		read(fd, str_read, BUFFER_SIZE);
 	}
+	free(str_read);
 	return (str);
 }
 
@@ -156,34 +158,37 @@ char	*get_next_line(int fd)
 	static char	*tail_str;
 	int			finded_index;
 	int			full_str_len;
+	char 		*str_read;
 
 	if (tail_str)
 	{
-		char *str_read = read_one_line(fd);
-		tail_str = ft_strjoin(tail_str, str_read);
-		return tail_str;
+		str_read = read_one_line(fd);
+		full_str = ft_strjoin(tail_str, str_read);
+		finded_index = ft_strchr(full_str, '\n') - &full_str[0];
+		full_str_len = ft_strlen(full_str);
+		str = ft_substr(full_str, 0, finded_index + 1);
+		tail_str = ft_substr(full_str, finded_index + 1, full_str_len - finded_index);
+		free(str_read);
 	}
 	else 
 	{
 		full_str = (const char *)read_one_line(fd);
 		finded_index = ft_strchr(full_str, '\n') - &full_str[0];
 		full_str_len = ft_strlen(full_str);
-		str = ft_substr(full_str, 0, finded_index);
+		str = ft_substr(full_str, 0, finded_index + 1);
 		tail_str = ft_substr(full_str, finded_index + 1, full_str_len - finded_index);
-		//?ask it
-		free((char *)full_str);
 	}
+	free((char *)full_str);
 	return (str);
 }
 
-// int main()
-// {
-// 	int fd = open("test", O_RDONLY);
-// 	char *a = get_next_line(fd);
-// 	char *b = get_next_line(fd);
-// 	puts(a);
-// 	puts(b);
-// 	free(a);
-// 	free(b);
-// 	// system("leaks a.out");
-// }
+int main()
+{
+	int fd = open("test", O_RDONLY);
+	char *a = get_next_line(fd);
+	char *b = get_next_line(fd);
+	puts(a);
+	puts(b);
+	free(a);
+	free(b);
+}
