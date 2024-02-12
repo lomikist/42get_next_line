@@ -1,12 +1,14 @@
 #include "get_next_line.h"
 
-#define BUFFER_SIZE 6
+#define BUFFER_SIZE 10
 
 size_t	ft_strlen(const char *s)
 {
 	size_t length;
 
 	length = 0;
+	if (!s)
+		return (length);	
 	while (s[length])
 		length++;
 	return (length);
@@ -26,26 +28,6 @@ char	*ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
-char	*ft_strcat(char *s1, const char *s2)
-{
-	int		a;
-	int		b;
-	char	*tmp;
-	char	*s1_for_free;
-
-	s1_for_free = s1;
-	a = ft_strlen(s1);
-	b = 0;
-	tmp = s1;
-	s1 = (char*)malloc((ft_strlen(s1) + ft_strlen((char*)s2)) + 1);
-	ft_strcpy(s1, tmp);
-	while (s2[b])
-		s1[a++] = s2[b++];
-	s1[a] = '\0';
-	free(s1_for_free);
-	return (s1);
-}
-
 char	*ft_strchr(const char *s, int c)
 {
 	unsigned int	i;
@@ -53,6 +35,8 @@ char	*ft_strchr(const char *s, int c)
 
 	str = (char *)s;
 	i = 0;
+	if (!s)
+		return (0);
 	while (str[i] != '\0')
 	{
 		if (str[i] == (char)c)
@@ -71,7 +55,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	char			*substr;
 
 	if (!s)
-		return (0);
+		return (NULL);
 	str_len = ft_strlen(s);
 	if (start >= str_len)
 		len = 0;
@@ -130,15 +114,12 @@ char	*read_one_line(int fd)
 	buffer_counter = 1;
 	str_read = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
 	read(fd, str_read, BUFFER_SIZE);
-	while (!ft_strchr(str_read, '\n'))
+	while ((str_read > 0) && (!ft_strchr(str_read, '\n') || !str))
 	{
 		if (str)
 		{
-			str_temp = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
-			ft_strcpy(str_temp, str);
 			read(fd, str_read, BUFFER_SIZE);
 			str = ft_strjoin(str, str_read);
-			free(str_temp);
 		}
 		else 
 		{
@@ -164,19 +145,19 @@ char	*get_next_line(int fd)
 	{
 		str_read = read_one_line(fd);
 		full_str = ft_strjoin(tail_str, str_read);
-		finded_index = ft_strchr(full_str, '\n') - &full_str[0];
+		finded_index = ft_strchr(full_str, '\n') - &full_str[0] + 1;
 		full_str_len = ft_strlen(full_str);
-		str = ft_substr(full_str, 0, finded_index + 1);
-		tail_str = ft_substr(full_str, finded_index + 1, full_str_len - finded_index);
+		str = ft_substr(full_str, 0, finded_index);
+		tail_str = ft_substr(full_str, finded_index, full_str_len - finded_index);
 		free(str_read);
 	}
 	else 
 	{
 		full_str = (const char *)read_one_line(fd);
-		finded_index = ft_strchr(full_str, '\n') - &full_str[0];
+		finded_index = ft_strchr(full_str, '\n') - &full_str[0] + 1;
 		full_str_len = ft_strlen(full_str);
-		str = ft_substr(full_str, 0, finded_index + 1);
-		tail_str = ft_substr(full_str, finded_index + 1, full_str_len - finded_index);
+		str = ft_substr(full_str, 0, finded_index);
+		tail_str = ft_substr(full_str, finded_index, full_str_len - finded_index);
 	}
 	free((char *)full_str);
 	return (str);
@@ -187,8 +168,20 @@ int main()
 	int fd = open("test", O_RDONLY);
 	char *a = get_next_line(fd);
 	char *b = get_next_line(fd);
+	char *c = get_next_line(fd);
+	char *a1 = get_next_line(fd);
+	char *b1 = get_next_line(fd);
+	char *c1 = get_next_line(fd);
+	char *d = get_next_line(fd);
+	// char *e = get_next_line(fd);
 	puts(a);
 	puts(b);
-	free(a);
-	free(b);
+	puts(c);
+	puts(a1);
+	puts(b1);
+	puts(c1);
+	puts(d);
+	// puts(e);
+	// free(a);
+	// free(b);
 }
