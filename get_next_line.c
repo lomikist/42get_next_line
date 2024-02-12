@@ -1,6 +1,6 @@
 #include "get_next_line.h"
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 1000
 
 size_t	ft_strlen(const char *s)
 {
@@ -75,6 +75,28 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 
+char	*ft_strdup(char *src)
+{
+	char	*new;
+	int		i;
+	int		size;
+
+	size = 0;
+	while (src[size])
+		++size;
+	if (!(new = malloc(sizeof(char) * (size + 1))))
+		return (NULL);
+	i = 0;
+	while (src[i])
+	{
+		new[i] = src[i];
+		i++;
+	}
+	free(src);
+	new[i] = '\0';
+	return (new);
+}
+
 char	*ft_strjoin(char *s1, const char *s2)
 {
 	char	*str;
@@ -112,9 +134,9 @@ char	*read_one_line(int fd)
 	int		buffer_counter;
 
 	buffer_counter = 1;
-	str_read = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
-	read(fd, str_read, BUFFER_SIZE);
-	while ((str_read > 0) && (!ft_strchr(str_read, '\n') || !str))
+	str_read = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
+	int count = read(fd, str_read, BUFFER_SIZE);
+	while ((count > 0) && (!ft_strchr(str_read, '\n') || !str))
 	{
 		if (str)
 		{
@@ -123,7 +145,7 @@ char	*read_one_line(int fd)
 		}
 		else 
 		{
-			str = malloc(sizeof(char) * (BUFFER_SIZE * buffer_counter));
+			str = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
 			ft_strcpy(str, str_read);
 		}
 		buffer_counter++;
@@ -144,7 +166,10 @@ char	*get_next_line(int fd)
 	if (tail_str)
 	{
 		str_read = read_one_line(fd);
-		full_str = ft_strjoin(tail_str, str_read);
+		if (str_read)
+			full_str = ft_strjoin(tail_str, str_read);
+		else 
+			full_str = ft_strdup(tail_str);
 		finded_index = ft_strchr(full_str, '\n') - &full_str[0] + 1;
 		full_str_len = ft_strlen(full_str);
 		str = ft_substr(full_str, 0, finded_index);
