@@ -1,7 +1,5 @@
 #include "get_next_line.h"
 
-#define BUFFER_SIZE 1000
-
 size_t	ft_strlen(const char *s)
 {
 	size_t length;
@@ -130,7 +128,6 @@ char	*read_one_line(int fd)
 {
 	char	*str_read = NULL;
 	char	*str = NULL;
-	char	*str_temp = NULL;
 	int		buffer_counter;
 
 	buffer_counter = 1;
@@ -140,8 +137,9 @@ char	*read_one_line(int fd)
 	{
 		if (str)
 		{
-			read(fd, str_read, BUFFER_SIZE);
-			str = ft_strjoin(str, str_read);
+			count = read(fd, str_read, BUFFER_SIZE);
+			if (count > 0)
+				str = ft_strjoin(str, str_read);
 		}
 		else 
 		{
@@ -198,7 +196,7 @@ int main()
 	char *b1 = get_next_line(fd);
 	char *c1 = get_next_line(fd);
 	char *d = get_next_line(fd);
-	// char *e = get_next_line(fd);
+	char *e = get_next_line(fd);
 	puts(a);
 	puts(b);
 	puts(c);
@@ -206,7 +204,7 @@ int main()
 	puts(b1);
 	puts(c1);
 	puts(d);
-	// puts(e);
+	puts(e);
 	// free(a);
 	// free(b);
 }
