@@ -129,11 +129,11 @@ char	*read_one_line(int fd)
 	char	*str_read = NULL;
 	char	*str = NULL;
 	int		buffer_counter;
+	int count = 1;
 
 	buffer_counter = 1;
 	str_read = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
-	int count = read(fd, str_read, BUFFER_SIZE);
-	while ((count > 0) && (!ft_strchr(str_read, '\n') || !str))
+	while ((count > 0) && (!ft_strchr(str_read, '\n')))
 	{
 		if (str)
 		{
@@ -143,6 +143,7 @@ char	*read_one_line(int fd)
 		}
 		else 
 		{
+			count = read(fd, str_read, BUFFER_SIZE);
 			str = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
 			ft_strcpy(str, str_read);
 		}
@@ -177,6 +178,7 @@ char	*get_next_line(int fd)
 	else 
 	{
 		full_str = (const char *)read_one_line(fd);
+		int full_str_len = ft_strlen(full_str);
 		finded_index = ft_strchr(full_str, '\n') - &full_str[0] + 1;
 		full_str_len = ft_strlen(full_str);
 		str = ft_substr(full_str, 0, finded_index);
@@ -191,20 +193,21 @@ int main()
 	int fd = open("test", O_RDONLY);
 	char *a = get_next_line(fd);
 	char *b = get_next_line(fd);
-	char *c = get_next_line(fd);
-	char *a1 = get_next_line(fd);
-	char *b1 = get_next_line(fd);
-	char *c1 = get_next_line(fd);
-	char *d = get_next_line(fd);
-	char *e = get_next_line(fd);
+	// char *c = get_next_line(fd);
+	// char *a1 = get_next_line(fd);
+	// char *b1 = get_next_line(fd);
+	// char *c1 = get_next_line(fd);
+	// char *d = get_next_line(fd);
+	// char *e = get_next_line(fd);
 	puts(a);
 	puts(b);
-	puts(c);
-	puts(a1);
-	puts(b1);
-	puts(c1);
-	puts(d);
-	puts(e);
+	// puts(c);
+	// puts(a1);
+	// puts(b1);
+	// puts(c1);
+	// puts(d);
+	// puts(e);
 	// free(a);
 	// free(b);
+	// system("leaks a.out");
 }
