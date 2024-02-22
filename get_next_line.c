@@ -9,7 +9,7 @@ char	*ft_substr(const char *s, unsigned int start, size_t len);
 char	*read_one_line(int fd)
 {
 	char	str_read[BUFFER_SIZE + 1];
-	char	*str;
+	char	*str = NULL;
 	int 	count = 1;
 	int		i;
 
@@ -20,13 +20,15 @@ char	*read_one_line(int fd)
 	while ((count > 0) && (!ft_strchr(str_read, '\n')))
 	{
 		count = read(fd, str_read, BUFFER_SIZE);
+		if (count < 0)
+			return (str);
+		str_read[count] = '\0';
 		if (str)
-		{
-			if (count > 0)
-				str = ft_strjoin(str, str_read);
-		}
-		else 
+			str = ft_strjoin(str, str_read);
+		else
 			str = ft_strdup(str_read);
+		if (!str)
+			return NULL;
 	}
 	return (str);
 }
@@ -69,7 +71,7 @@ char	*get_next_line(int fd)
 int main()
 {
 	int fd = open("test", O_RDONLY);
-	char *a = get_next_line(fd);
+	char *a = read_one_line(fd);
 	char *b = get_next_line(fd);
 	// char *c = get_next_line(fd);
 	// char *a1 = get_next_line(fd);
@@ -78,7 +80,7 @@ int main()
 	// char *d = get_next_line(fd);
 	// char *e = get_next_line(fd);
 	puts(a);
-	puts(b);
+	// puts(b);
 	// puts(c);
 	// puts(a1);
 	// puts(b1);
