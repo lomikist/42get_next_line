@@ -1,155 +1,33 @@
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
-{
-	size_t length;
-
-	length = 0;
-	if (!s)
-		return (length);	
-	while (s[length])
-		length++;
-	return (length);
-}
-
-char	*ft_strcpy(char *dest, char *src)
-{
-	unsigned int	i;
-
-	i = 0;
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	unsigned int	i;
-	char			*str;
-
-	str = (char *)s;
-	i = 0;
-	if (!s)
-		return (0);
-	while (str[i] != '\0')
-	{
-		if (str[i] == (char)c)
-			return (&str[i]);
-		i++;
-	}
-	if (str[i] == (char)c)
-		return (&str[i]);
-	return (0);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	unsigned int	i;
-	unsigned int	str_len;
-	char			*substr;
-
-	if (!s)
-		return (NULL);
-	str_len = ft_strlen(s);
-	if (start >= str_len)
-		len = 0;
-	if (len > str_len - start)
-		len = str_len - start;
-	substr = malloc(len + 1);
-	if (!substr)
-		return (0);
-	i = 0;
-	while (i < len && s[start])
-	{
-		substr[i] = s[start];
-		start++;
-		i++;
-	}
-	substr[i] = '\0';
-	return (substr);
-}
-
-char	*ft_strdup(char *src)
-{
-	char	*new;
-	int		i;
-	int		size;
-
-	size = 0;
-	while (src[size])
-		++size;
-	if (!(new = malloc(sizeof(char) * (size + 1))))
-		return (NULL);
-	i = 0;
-	while (src[i])
-	{
-		new[i] = src[i];
-		i++;
-	}
-	free(src);
-	new[i] = '\0';
-	return (new);
-}
-
-char	*ft_strjoin(char *s1, const char *s2)
-{
-	char	*str;
-	size_t	i;
-	size_t	j;
-
-	if (!s1 || !s2)
-		return (NULL);
-	str = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (s1[i])
-	{
-		str[i] = s1[i];
-		++i;
-	}
-	j = 0;
-	while (s2[j])
-	{
-		str[i] = s2[j];
-		++j;
-		++i;
-	}
-	free(s1);
-	str[i] = '\0';
-	return (str);
-}
+size_t	ft_strlen(const char *s);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *s1);
+char	*ft_strjoin(char *s1, const char *s2);
+char	*ft_substr(const char *s, unsigned int start, size_t len);
 
 char	*read_one_line(int fd)
 {
-	char	*str_read = NULL;
-	char	*str = NULL;
-	int		buffer_counter;
-	int count = 1;
+	char	str_read[BUFFER_SIZE + 1];
+	char	*str;
+	int 	count = 1;
+	int		i;
 
-	buffer_counter = 1;
-	str_read = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
+	i = -1;
+	while (++i <= BUFFER_SIZE)
+		str_read[i] = '\0';
+
 	while ((count > 0) && (!ft_strchr(str_read, '\n')))
 	{
+		count = read(fd, str_read, BUFFER_SIZE);
 		if (str)
 		{
-			count = read(fd, str_read, BUFFER_SIZE);
 			if (count > 0)
 				str = ft_strjoin(str, str_read);
 		}
 		else 
-		{
-			count = read(fd, str_read, BUFFER_SIZE);
-			str = (char *)calloc(BUFFER_SIZE * buffer_counter, sizeof(char));
-			ft_strcpy(str, str_read);
-		}
-		buffer_counter++;
+			str = ft_strdup(str_read);
 	}
-	free(str_read);
 	return (str);
 }
 
