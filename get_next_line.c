@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: arsargsy <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/02/24 19:02:36 by arsargsy          #+#    #+#             */
+/*   Updated: 2024/02/24 19:02:39 by arsargsy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 char	*read_one_line(char *str, int fd)
 {
 	char	str_read[BUFFER_SIZE + 1];
-	int 	count = 1;
+	int		count;
 
 	count = -1;
 	while (++count <= BUFFER_SIZE)
@@ -29,10 +41,12 @@ char	*get_next_line(int fd)
 {
 	static char	*tail_str;
 	int			i;
-	char 		*str;
+	char		*str;
 	char		*temp;	
 
 	i = 0;
+	if (fd < 0 || BUFFER_SIZE < 1)
+		return (NULL);
 	tail_str = read_one_line(tail_str, fd);
 	if (!tail_str)
 		return (NULL);
@@ -44,27 +58,3 @@ char	*get_next_line(int fd)
 	free(temp);
 	return (str);
 }
-
-// int main()
-// {
-// 	int fd = open("test", O_RDONLY);
-// 	char *a = get_next_line(fd);
-// 	// char *b = get_next_line(fd);
-// 	// char *c = get_next_line(fd);
-// 	// char *a1 = get_next_line(fd);
-// 	// char *b1 = get_next_line(fd);
-// 	// char *c1 = get_next_line(fd);
-// 	// char *d = get_next_line(fd);
-// 	// char *e = get_next_line(fd);
-// 	puts(a);
-// 	// puts(b);
-// 	// puts(c);
-// 	// puts(a1);
-// 	// puts(b1);
-// 	// puts(c1);
-// 	// puts(d);
-// 	// puts(e);
-// 	// free(a);
-// 	// free(b);
-// 	// system("leaks a.out");
-// }
